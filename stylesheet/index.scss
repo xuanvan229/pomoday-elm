@@ -1,0 +1,23 @@
+/**
+ * ITCSS Structure
+ *
+ * Settings............ Global variables, config swtiches
+ * Tools............... Default mixin and functions
+ * Generic............. Ground-zero styles (reset, normalize, sanitize)
+ * elements............ Unclassed HTML elements (type selectors)
+ * Objects............. Cosmetic-free design patterns
+ * Components.......... Design components, chunks of UI
+ * Trumps.............. Helpers and overrides (!important)
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "01-settings";
+@import "02-tools";
+@import "03-generic";
+@import "04-elements";
+@import "05-objects";
+@import "06-components";
+@import "07-trumps";

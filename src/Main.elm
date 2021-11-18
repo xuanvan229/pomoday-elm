@@ -100,11 +100,14 @@ toKey string =
 
 view : Model -> Browser.Document Msg
 view model =
-  { title = "URL Interceptor"
+  { title = "Pomoday Elm"
   , body =
-      [ text "Onkeydown listener "
-      , b [] [ text (String.fromChar model.char) ]
-      ]
+  [
+    div [class "flex items-center text-2xl mt-10"] [
+      h1 [ class "font-bold mr-4" ] [text "Pomoday elm: "] ,
+      b [ ] [ text (String.fromChar model.char) ]
+    ]
+  ]
   }
 
 
