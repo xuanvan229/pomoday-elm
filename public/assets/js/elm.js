@@ -5150,20 +5150,22 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$application = _Browser_application;
-var $author$project$Main$Model = F3(
-	function (key, url, _char) {
-		return {_char: _char, key: key, url: url};
+var $author$project$Main$Model = F5(
+	function (key, url, _char, text, show) {
+		return {_char: _char, key: key, show: show, text: text, url: url};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = F3(
 	function (flags, url, key) {
 		return _Utils_Tuple2(
-			A3(
+			A5(
 				$author$project$Main$Model,
 				key,
 				url,
-				_Utils_chr('C')),
+				_Utils_chr('C'),
+				'',
+				false),
 			$elm$core$Platform$Cmd$none);
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
@@ -5592,6 +5594,38 @@ var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, $
 var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDecoder);
 };
+var $author$project$Main$NoOp = {$: 'NoOp'};
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Task$onError = _Scheduler_onError;
+var $elm$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return $elm$core$Task$command(
+			$elm$core$Task$Perform(
+				A2(
+					$elm$core$Task$onError,
+					A2(
+						$elm$core$Basics$composeL,
+						A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+						$elm$core$Result$Err),
+					A2(
+						$elm$core$Task$andThen,
+						A2(
+							$elm$core$Basics$composeL,
+							A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+							$elm$core$Result$Ok),
+						task))));
+	});
+var $elm$browser$Browser$Dom$focus = _Browser_call('focus');
+var $author$project$Main$focusSearchBox = A2(
+	$elm$core$Task$attempt,
+	function (_v0) {
+		return $author$project$Main$NoOp;
+	},
+	$elm$browser$Browser$Dom$focus('input-box'));
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
 var $elm$url$Url$addPort = F2(
@@ -5641,6 +5675,8 @@ var $elm$url$Url$toString = function (url) {
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
+			case 'NoOp':
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'LinkClicked':
 				var urlRequest = msg.a;
 				if (urlRequest.$ === 'Internal') {
@@ -5669,14 +5705,23 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{_char: letter}),
-					$elm$core$Platform$Cmd$none);
+						{_char: letter, show: true}),
+					$author$project$Main$focusSearchBox);
 			default:
 				var string = msg.a;
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				return (string === 'Escape') ? _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{show: false}),
+					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{show: true, text: string}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $elm$html$Html$b = _VirtualDom_node('b');
+var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5692,6 +5737,48 @@ var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $author$project$Main$renderInputModal = function (model) {
+	return model.show ? A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('w-9/12 p-2 bg-white rounded-md shadow-lg bg-gray-100 border-indigo-400	')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$id('input-box'),
+								$elm$html$Html$Attributes$class('w-full text-sm bg-transparent p-2 outline-none'),
+								$elm$html$Html$Attributes$placeholder('Type anything here...'),
+								$elm$html$Html$Attributes$autofocus(true)
+							]),
+						_List_Nil)
+					]))
+			])) : A2($elm$html$Html$div, _List_Nil, _List_Nil);
+};
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$view = function (model) {
@@ -5702,10 +5789,11 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('flex items-center text-2xl mt-10')
+						$elm$html$Html$Attributes$class('flex font-mono items-center text-2xl mt-10')
 					]),
 				_List_fromArray(
 					[
+						$author$project$Main$renderInputModal(model),
 						A2(
 						$elm$html$Html$h1,
 						_List_fromArray(
@@ -5723,6 +5811,14 @@ var $author$project$Main$view = function (model) {
 							[
 								$elm$html$Html$text(
 								$elm$core$String$fromChar(model._char))
+							])),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$b,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(model.text)
 							]))
 					]))
 			]),
