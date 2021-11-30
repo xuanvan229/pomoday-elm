@@ -6,8 +6,9 @@ import Browser.Dom as Dom
 import Browser.Events as Events
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Url
 import Json.Decode as Decode
+import Html.Events exposing (onInput)
+import Url
 import Task
 
 
@@ -28,6 +29,10 @@ main =
 
 
 
+type alias Todo =
+  { title : String
+  , completed : Bool
+  }
 -- MODEL
 
 
@@ -37,12 +42,13 @@ type alias Model =
   , char : Char
   , text: String
   , show : Bool
+  , todos: List Todo
   }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-  ( Model key url 'C' "" False, Cmd.none )
+  ( Model key url 'C' "" False [], Cmd.none)
 
 
 
@@ -54,6 +60,8 @@ type Msg
   | UrlChanged Url.Url
   | PressedLetter Char
   | PressedString String
+  | TodoAdded String
+  | OnChange String
   | NoOp
 
 
@@ -74,13 +82,23 @@ update msg model =
       ( { model | url = url }
       , Cmd.none
       )
+    TodoAdded text ->
+      ( { model | todos = model.todos ++ [ Todo text False ] }
+      , Cmd.none
+      )
+    OnChange string -> 
+      ( { model | text = string }
+      , Cmd.none
+      )
     PressedLetter letter ->
       ( { model | char = letter, show= True }, focusSearchBox )
     PressedString string ->
       if string == "Escape" then
         ( { model | show = False }, Cmd.none )
+      else if string == "Enter" then
+        ( { model | todos = model.todos ++ [Todo model.text False], show = False, text = "" }, Cmd.none )
       else
-        ( { model | text = string, show = True }, Cmd.none )
+        ( { model | show = True }, Cmd.none )
 
 
 
@@ -109,7 +127,23 @@ toKey string =
 
         _ ->
             PressedString string
+
+onChangeValue : String -> Msg
+onChangeValue value =
+    OnChange value
 -- VIEW
+
+
+renderTodo : Todo -> Html Msg
+renderTodo todo =
+  li [ class "todo" ]
+    [ 
+      div [ class "view" ]
+      [
+        input [type_ "checkbox"] [],
+        label [] [ text todo.title ]
+      ]
+    ]
 
 
 renderInputModal : Model -> Html Msg
@@ -120,7 +154,7 @@ renderInputModal model =
         class "fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center"
       ] [
         div [class "w-9/12 p-2 bg-white rounded-md shadow-lg bg-gray-100 border-indigo-400	"] [
-          input [id "input-box", class "w-full text-sm bg-transparent p-2 outline-none", placeholder "Type anything here...", autofocus True] []
+          input [onInput OnChange ,  id "input-box", class "w-full text-sm bg-transparent p-2 outline-none", placeholder "Type anything here...", autofocus True] []
         ]
       ]
     else
@@ -134,9 +168,17 @@ view model =
     div [class "flex font-mono items-center text-2xl mt-10"] [
       renderInputModal(model),
       h1 [ class "font-bold mr-4" ] [text "Pomoday elm: "] ,
-      b [ ] [ text (String.fromChar model.char) ],
-      br [] [],
-      b [ ] [ text (model.text) ]
+      div [ ] [ text (String.fromChar model.char) ],
+      br [] []
+    ],
+    div [] [
+      div [ ] [ text (model.text) ]
+    ],
+    div [] [
+      div [ ] [ text (String.fromInt (List.length model.todos) ) ]
+    ],
+    div [] [
+      ul [] (List.map renderTodo model.todos)
     ]
   ]
   }
