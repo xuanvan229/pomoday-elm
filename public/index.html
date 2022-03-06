@@ -22,13 +22,13 @@
 
   app.ports.parseString.subscribe(function(message) {
     const parseTaskCommand = (str) => str.match(/^(t(?:ask)?)\s(@(?:\S*['-]?)(?:[0-9a-zA-Z'-]+))?([\s\S]*)/i);
-    console.log("string ->", parseTaskCommand(message));
     const todo = {
       group : parseTaskCommand(message)[2],
       title: parseTaskCommand(message)[3]
     }
     app.ports.getTaskParsed.send(JSON.stringify(todo))
   });
+  
   </script>
 </body>
 </html>

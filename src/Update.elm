@@ -1,7 +1,7 @@
 port module Update exposing (..)
 import Browser
 import Msg exposing (Msg(..))
-import Model exposing (Model, Todo)
+import Model exposing (Model, Group, Todo)
 import Browser.Navigation as Nav
 import Url
 import Browser.Dom as Dom
@@ -47,8 +47,13 @@ update msg model =
         ( { model | show = True }, Cmd.none )
     RecvMsg textRecv -> 
       case decodeString todoCreate textRecv of
-        Ok todo -> 
-         ( { model | todos = model.todos ++ [Todo todo.title False] }, Cmd.none )
+        Ok todo ->
+          let 
+            isContain item = if (item.name == todo.group) then True else False
+            updateGroup item = if (item.name == todo.group ) then {item | todos = item.todos ++ [Todo todo.title False]} else  item
+            groups = if List.any isContain model.groups then List.map updateGroup model.groups else model.groups ++ [Group todo.group [Todo todo.title False]]
+          in
+            ( { model | todos = model.todos ++ [Todo textRecv False], groups = groups }, Cmd.none )
         Err error ->
           ( { model | todos = model.todos ++ [Todo textRecv False] }, Cmd.none )
 

@@ -5,7 +5,7 @@ import Browser.Navigation as Nav
 type alias Group = 
   {
     name: String,
-    todo: List Todo
+    todos: List Todo
   }
 
 type alias Todo =

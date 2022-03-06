@@ -7,6 +7,7 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
+import Model exposing (Group)
 
 
 view : Model -> Browser.Document Msg
@@ -18,17 +19,10 @@ view model =
       div [class "flex font-mono items-center text-2xl"] [
         renderInputModal(model),
         h1 [ class "font-bold mr-4" ] [text "Pomoday elm: "] ,
-        div [ ] [ text (String.fromChar model.char) ],
         br [] []
       ],
       div [] [
-        div [ ] [ text (model.text) ]
-      ],
-      div [] [
-        div [ ] [ text (String.fromInt (List.length model.todos) ) ]
-      ],
-      div [] [
-        ul [] (List.map renderTodo model.todos)
+        ul [] (List.map rendergroupTodo model.groups)
       ]
     ]
   ]
@@ -39,6 +33,16 @@ viewLink : String -> Html msg
 viewLink path =
   li [] [ a [ href path ] [ text path ] ]
 
+
+rendergroupTodo: Group -> Html Msg
+rendergroupTodo group =
+  li [] [
+    div [ class "flex items-center" ] [
+      div [ class "mr-4" ] [ text (group.name) ],
+      div [ ] [ text (String.fromInt (List.length group.todos) ) ]
+    ],
+    ul [] (List.map renderTodo group.todos)
+  ]
 
 renderTodo : Todo -> Html Msg
 renderTodo todo =

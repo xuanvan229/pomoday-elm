@@ -14,6 +14,7 @@ import Model exposing (Todo, Model)
 import View exposing (view)
 import Msg exposing (Msg(..))
 import Update exposing (update)
+import Update exposing (update)
 
 -- MAIN
 
