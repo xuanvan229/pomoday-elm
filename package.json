@@ -1,10 +1,10 @@
 {
   "name": "pomoday-elm",
   "version": "1.0.0",
-  "main": "index.js",
   "repository": "git@github.com:xuanvan229/pomoday-elm.git",
   "author": "Hong Xuan <xuanvan229@gmail.com>",
   "license": "MIT",
+  "source": "public/index.html",
   "scripts": {
     "clean": "rm -rf elm-stuff",
     "compile:elm": "elm make src/Main.elm --output=public/assets/js/elm.js",
@@ -12,13 +12,16 @@
     "compile": "run-p compile:elm compile:css",
     "dev": "run-p watch serve",
     "build": "elm make src/Main.elm --output=public/assets/js/elm.js --optimize",
-    "serve": "serve public",
+    "serve": "serve dist",
     "watch:elm": "watch 'yarn run compile:elm' src",
     "watch:css": "watch 'yarn run compile:css' stylesheet src",
-    "watch": "run-p watch:elm watch:css"
+    "watch": "run-p watch:elm watch:css",
+    "start:parcel": "parcel",
+    "build:parcel": "parcel build"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.0",
+    "parcel": "^2.3.2",
     "postcss": "^8.3.11",
     "postcss-cli": "^9.0.2",
     "tailwindcss": "^2.2.19",
