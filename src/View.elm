@@ -14,20 +14,22 @@ view model =
   { title = "Pomoday Elm"
   , body =
   [
-    div [class "flex font-mono items-center text-2xl mt-10"] [
-      renderInputModal(model),
-      h1 [ class "font-bold mr-4" ] [text "Pomoday elm: "] ,
-      div [ ] [ text (String.fromChar model.char) ],
-      br [] []
-    ],
-    div [] [
-      div [ ] [ text (model.text) ]
-    ],
-    div [] [
-      div [ ] [ text (String.fromInt (List.length model.todos) ) ]
-    ],
-    div [] [
-      ul [] (List.map renderTodo model.todos)
+    div [ class "p-10 h-screen"] [
+      div [class "flex font-mono items-center text-2xl"] [
+        renderInputModal(model),
+        h1 [ class "font-bold mr-4" ] [text "Pomoday elm: "] ,
+        div [ ] [ text (String.fromChar model.char) ],
+        br [] []
+      ],
+      div [] [
+        div [ ] [ text (model.text) ]
+      ],
+      div [] [
+        div [ ] [ text (String.fromInt (List.length model.todos) ) ]
+      ],
+      div [] [
+        ul [] (List.map renderTodo model.todos)
+      ]
     ]
   ]
   }
@@ -42,9 +44,9 @@ renderTodo : Todo -> Html Msg
 renderTodo todo =
   li [ class "todo" ]
     [ 
-      div [ class "view" ]
+      div [ class "flex items-center view" ]
       [
-        input [type_ "checkbox"] [],
+        span [ class "w-4 h-4 border border-2 border-stone-800 flex mr-2"][],
         label [] [ text todo.title ]
       ]
     ]

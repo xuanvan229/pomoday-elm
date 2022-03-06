@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
@@ -30,19 +30,19 @@ main =
     }
 
 
-
-
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-  ( Model key url 'C' "" False [], Cmd.none)
+  ( Model key url 'C' "" False [] [], Cmd.none)
 
 
 -- SUBSCRIPTIONS
 
 
+port getTaskParsed : (String -> msg) -> Sub msg
+
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-  Events.onKeyDown keyDecoder
+  Sub.batch [ Events.onKeyDown keyDecoder, getTaskParsed RecvMsg]
 
 
 

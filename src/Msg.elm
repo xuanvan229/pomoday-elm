@@ -10,4 +10,5 @@ type Msg
   | PressedString String
   | TodoAdded String
   | OnChange String
+  | RecvMsg String
   | NoOp

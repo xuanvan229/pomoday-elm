@@ -1,4 +1,4 @@
-module Update exposing (..)
+port module Update exposing (..)
 import Browser
 import Msg exposing (Msg(..))
 import Model exposing (Model, Todo)
@@ -6,6 +6,10 @@ import Browser.Navigation as Nav
 import Url
 import Browser.Dom as Dom
 import Task
+import Json.Decode exposing (Decoder, decodeString, field, string)
+import Json.Decode exposing (map2)
+
+port parseString : String -> Cmd msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -38,12 +42,24 @@ update msg model =
       if string == "Escape" then
         ( { model | show = False }, Cmd.none )
       else if string == "Enter" then
-        ( { model | todos = model.todos ++ [Todo model.text False], show = False, text = "" }, Cmd.none )
+        ( { model | show = False, text = "" }, parseString model.text )
       else
         ( { model | show = True }, Cmd.none )
+    RecvMsg textRecv -> 
+      case decodeString todoCreate textRecv of
+        Ok todo -> 
+         ( { model | todos = model.todos ++ [Todo todo.title False] }, Cmd.none )
+        Err error ->
+          ( { model | todos = model.todos ++ [Todo textRecv False] }, Cmd.none )
 
 
 
 focusSearchBox : Cmd Msg
 focusSearchBox =
     Task.attempt (\_ -> NoOp) (Dom.focus "input-box")
+
+todoCreate : Decoder Model.TodoCreate
+todoCreate =
+  map2 Model.TodoCreate
+    (field "title" string)
+    (field "group" string)
