@@ -9,8 +9,11 @@ type alias Group =
   }
 
 type alias Todo =
-  { title : String
+  { 
+    id: Int
+  ,  title : String
   , completed : Bool
+  , starting: Bool
   }
 
 type alias TodoCreate = 
@@ -28,4 +31,5 @@ type alias Model =
   , show : Bool
   , groups : List Group
   , todos: List Todo
+  , total: Int
   }

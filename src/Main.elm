@@ -10,10 +10,9 @@ import Json.Decode as Decode
 import Html.Events exposing (onInput)
 import Url
 import Task
-import Model exposing (Todo, Model)
+import Model exposing (Todo, Group, Model)
 import View exposing (view)
 import Msg exposing (Msg(..))
-import Update exposing (update)
 import Update exposing (update)
 
 -- MAIN
@@ -31,19 +30,31 @@ main =
     }
 
 
+groups :  List Group
+groups = [ Group "@personal" [  {id =  1,  title = "Buy milk", completed = False, starting = False} 
+                              , {id =  2,  title = "Buy eggs", completed = False, starting = False} 
+                              , {id =  3,  title = "Buy bread", completed = False, starting = False} 
+                              ]
+         , Group "@work" [    {id =  4,  title = "Buy milk", completed = False, starting = False} 
+                            , {id =  5,  title = "Buy eggs", completed = False, starting = False} 
+                            , {id =  6,  title = "Buy bread", completed = False, starting = False} 
+                         ]
+         ]
+
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-  ( Model key url 'C' "" False [] [], Cmd.none)
+  ( Model key url 'C' "" False groups [] 6, Cmd.none)
 
 
 -- SUBSCRIPTIONS
 
 
-port getTaskParsed : (String -> msg) -> Sub msg
+port createNewTask : (String -> msg) -> Sub msg
+port startATask : (Int -> msg) -> Sub msg
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-  Sub.batch [ Events.onKeyDown keyDecoder, getTaskParsed RecvMsg]
+  Sub.batch [ Events.onKeyDown keyDecoder, createNewTask CreateTask, startATask BeginTask]
 
 
 

@@ -29,7 +29,7 @@ update msg model =
       , Cmd.none
       )
     TodoAdded text ->
-      ( { model | todos = model.todos ++ [ Todo text False ] }
+      ( { model | todos = model.todos ++ [ {id =  1,  title = text, completed = False, starting = False} ] }
       , Cmd.none
       )
     OnChange string -> 
@@ -45,17 +45,28 @@ update msg model =
         ( { model | show = False, text = "" }, parseString model.text )
       else
         ( { model | show = True }, Cmd.none )
-    RecvMsg textRecv -> 
-      case decodeString todoCreate textRecv of
+    BeginTask id -> 
+      let
+        updateTodos item = if (item.id == id ) then {item | starting = True} else  item
+        updateGroup group = {group | todos = List.map updateTodos group.todos}
+        groups = List.map updateGroup model.groups
+      in
+      
+      ( {model | groups = groups}, Cmd.none )
+    CreateTask jsonData -> 
+      case decodeString todoCreate jsonData of
         Ok todo ->
           let 
             isContain item = if (item.name == todo.group) then True else False
-            updateGroup item = if (item.name == todo.group ) then {item | todos = item.todos ++ [Todo todo.title False]} else  item
-            groups = if List.any isContain model.groups then List.map updateGroup model.groups else model.groups ++ [Group todo.group [Todo todo.title False]]
+            total =  model.total + 1
+            updateGroup item = if (item.name == todo.group ) then {item | todos = item.todos ++ [ {id =  total,  title = todo.title, completed = False, starting = False} ]} else  item
+
+            groups = if List.any isContain model.groups then List.map updateGroup model.groups else model.groups ++ [Group todo.group [{id =  total,  title = todo.title, completed = False, starting = False}]]
           in
-            ( { model | todos = model.todos ++ [Todo textRecv False], groups = groups }, Cmd.none )
+            ( { model |groups = groups, total = total }, Cmd.none )
         Err error ->
-          ( { model | todos = model.todos ++ [Todo textRecv False] }, Cmd.none )
+          ( model , Cmd.none )
+     
 
 
 

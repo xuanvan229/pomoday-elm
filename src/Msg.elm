@@ -10,5 +10,6 @@ type Msg
   | PressedString String
   | TodoAdded String
   | OnChange String
-  | RecvMsg String
+  | CreateTask String
+  | BeginTask Int
   | NoOp

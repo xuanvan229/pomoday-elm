@@ -3469,7 +3469,7 @@ type alias Process =
         return $elm$core$Task$command($elm$core$Task$Perform(A2($elm$core$Task$map, toMessage, task)));
     });
     var $elm$browser$Browser$application = _Browser_application;
-    var $author$project$Model$Model = F7(function(key, url, _char, text, show, groups, todos) {
+    var $author$project$Model$Model = F8(function(key, url, _char, text, show, groups, todos, total) {
         return {
             _char: _char,
             groups: groups,
@@ -3477,23 +3477,78 @@ type alias Process =
             show: show,
             text: text,
             todos: todos,
+            total: total,
             url: url
         };
     });
+    var $author$project$Model$Group = F2(function(name, todos) {
+        return {
+            name: name,
+            todos: todos
+        };
+    });
+    var $author$project$Main$groups = _List_fromArray([
+        A2($author$project$Model$Group, '@personal', _List_fromArray([
+            {
+                completed: false,
+                id: 1,
+                starting: false,
+                title: 'Buy milk'
+            },
+            {
+                completed: false,
+                id: 2,
+                starting: false,
+                title: 'Buy eggs'
+            },
+            {
+                completed: false,
+                id: 3,
+                starting: false,
+                title: 'Buy bread'
+            }
+        ])),
+        A2($author$project$Model$Group, '@work', _List_fromArray([
+            {
+                completed: false,
+                id: 4,
+                starting: false,
+                title: 'Buy milk'
+            },
+            {
+                completed: false,
+                id: 5,
+                starting: false,
+                title: 'Buy eggs'
+            },
+            {
+                completed: false,
+                id: 6,
+                starting: false,
+                title: 'Buy bread'
+            }
+        ]))
+    ]);
     var $elm$core$Platform$Cmd$batch = _Platform_batch;
     var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
     var $author$project$Main$init = F3(function(flags, url, key) {
-        return _Utils_Tuple2(A7($author$project$Model$Model, key, url, _Utils_chr('C'), '', false, _List_Nil, _List_Nil), $elm$core$Platform$Cmd$none);
+        return _Utils_Tuple2(A8($author$project$Model$Model, key, url, _Utils_chr('C'), '', false, $author$project$Main$groups, _List_Nil, 6), $elm$core$Platform$Cmd$none);
     });
-    var $author$project$Msg$RecvMsg = function(a) {
+    var $author$project$Msg$BeginTask = function(a) {
         return {
-            $: 'RecvMsg',
+            $: 'BeginTask',
+            a: a
+        };
+    };
+    var $author$project$Msg$CreateTask = function(a) {
+        return {
+            $: 'CreateTask',
             a: a
         };
     };
     var $elm$core$Platform$Sub$batch = _Platform_batch;
     var $elm$json$Json$Decode$string = _Json_decodeString;
-    var $author$project$Main$getTaskParsed = _Platform_incomingPort('getTaskParsed', $elm$json$Json$Decode$string);
+    var $author$project$Main$createNewTask = _Platform_incomingPort('createNewTask', $elm$json$Json$Decode$string);
     var $elm$json$Json$Decode$field = _Json_decodeField;
     var $author$project$Msg$PressedLetter = function(a) {
         return {
@@ -3776,24 +3831,15 @@ type alias Process =
         return $elm$browser$Browser$Events$subscription(A3($elm$browser$Browser$Events$MySub, node, name, decoder));
     });
     var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keydown');
+    var $elm$json$Json$Decode$int = _Json_decodeInt;
+    var $author$project$Main$startATask = _Platform_incomingPort('startATask', $elm$json$Json$Decode$int);
     var $author$project$Main$subscriptions = function(_v0) {
         return $elm$core$Platform$Sub$batch(_List_fromArray([
             $elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDecoder),
-            $author$project$Main$getTaskParsed($author$project$Msg$RecvMsg)
+            $author$project$Main$createNewTask($author$project$Msg$CreateTask),
+            $author$project$Main$startATask($author$project$Msg$BeginTask)
         ]));
     };
-    var $author$project$Model$Group = F2(function(name, todos) {
-        return {
-            name: name,
-            todos: todos
-        };
-    });
-    var $author$project$Model$Todo = F2(function(title, completed) {
-        return {
-            completed: completed,
-            title: title
-        };
-    });
     var $elm$core$List$any = F2(function(isOkay, list) {
         any: while(true){
             if (!list.b) return false;
@@ -3880,7 +3926,12 @@ type alias Process =
                 var text = msg.a;
                 return _Utils_Tuple2(_Utils_update(model, {
                     todos: _Utils_ap(model.todos, _List_fromArray([
-                        A2($author$project$Model$Todo, text, false)
+                        {
+                            completed: false,
+                            id: 1,
+                            starting: false,
+                            title: text
+                        }
                     ]))
                 }), $elm$core$Platform$Cmd$none);
             case 'OnChange':
@@ -3904,15 +3955,37 @@ type alias Process =
                 }), $author$project$Update$parseString(model.text)) : _Utils_Tuple2(_Utils_update(model, {
                     show: true
                 }), $elm$core$Platform$Cmd$none);
+            case 'BeginTask':
+                var id = msg.a;
+                var updateTodos = function(item) {
+                    return _Utils_eq(item.id, id) ? _Utils_update(item, {
+                        starting: true
+                    }) : item;
+                };
+                var updateGroup = function(group) {
+                    return _Utils_update(group, {
+                        todos: A2($elm$core$List$map, updateTodos, group.todos)
+                    });
+                };
+                var groups = A2($elm$core$List$map, updateGroup, model.groups);
+                return _Utils_Tuple2(_Utils_update(model, {
+                    groups: groups
+                }), $elm$core$Platform$Cmd$none);
             default:
-                var textRecv = msg.a;
-                var _v2 = A2($elm$json$Json$Decode$decodeString, $author$project$Update$todoCreate, textRecv);
+                var jsonData = msg.a;
+                var _v2 = A2($elm$json$Json$Decode$decodeString, $author$project$Update$todoCreate, jsonData);
                 if (_v2.$ === 'Ok') {
                     var todo = _v2.a;
+                    var total = model.total + 1;
                     var updateGroup = function(item) {
                         return _Utils_eq(item.name, todo.group) ? _Utils_update(item, {
                             todos: _Utils_ap(item.todos, _List_fromArray([
-                                A2($author$project$Model$Todo, todo.title, false)
+                                {
+                                    completed: false,
+                                    id: total,
+                                    starting: false,
+                                    title: todo.title
+                                }
                             ]))
                         }) : item;
                     };
@@ -3921,32 +3994,29 @@ type alias Process =
                     };
                     var groups = A2($elm$core$List$any, isContain, model.groups) ? A2($elm$core$List$map, updateGroup, model.groups) : _Utils_ap(model.groups, _List_fromArray([
                         A2($author$project$Model$Group, todo.group, _List_fromArray([
-                            A2($author$project$Model$Todo, todo.title, false)
+                            {
+                                completed: false,
+                                id: total,
+                                starting: false,
+                                title: todo.title
+                            }
                         ]))
                     ]));
                     return _Utils_Tuple2(_Utils_update(model, {
                         groups: groups,
-                        todos: _Utils_ap(model.todos, _List_fromArray([
-                            A2($author$project$Model$Todo, textRecv, false)
-                        ]))
+                        total: total
                     }), $elm$core$Platform$Cmd$none);
                 } else {
                     var error = _v2.a;
-                    return _Utils_Tuple2(_Utils_update(model, {
-                        todos: _Utils_ap(model.todos, _List_fromArray([
-                            A2($author$project$Model$Todo, textRecv, false)
-                        ]))
-                    }), $elm$core$Platform$Cmd$none);
+                    return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
                 }
         }
     });
-    var $elm$html$Html$br = _VirtualDom_node('br');
     var $elm$html$Html$Attributes$stringProperty = F2(function(key, string) {
         return A2(_VirtualDom_property, key, $elm$json$Json$Encode$string(string));
     });
     var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
     var $elm$html$Html$div = _VirtualDom_node('div');
-    var $elm$html$Html$h1 = _VirtualDom_node('h1');
     var $author$project$Msg$OnChange = function(a) {
         return {
             $: 'OnChange',
@@ -4002,19 +4072,39 @@ type alias Process =
         ])) : A2($elm$html$Html$div, _List_Nil, _List_Nil);
     };
     var $elm$html$Html$li = _VirtualDom_node('li');
+    var $elm$core$List$filter = F2(function(isGood, list) {
+        return A3($elm$core$List$foldr, F2(function(x, xs) {
+            return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+        }), _List_Nil, list);
+    });
+    var $elm$core$Tuple$second = function(_v0) {
+        var y = _v0.b;
+        return y;
+    };
+    var $elm$html$Html$Attributes$classList = function(classes) {
+        return $elm$html$Html$Attributes$class(A2($elm$core$String$join, ' ', A2($elm$core$List$map, $elm$core$Tuple$first, A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
+    };
     var $elm$html$Html$label = _VirtualDom_node('label');
     var $elm$html$Html$span = _VirtualDom_node('span');
     var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
     var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
     var $author$project$View$renderTodo = function(todo) {
         return A2($elm$html$Html$li, _List_fromArray([
-            $elm$html$Html$Attributes$class('todo')
+            $elm$html$Html$Attributes$class('todo p-2')
         ]), _List_fromArray([
             A2($elm$html$Html$div, _List_fromArray([
                 $elm$html$Html$Attributes$class('flex items-center view')
             ]), _List_fromArray([
                 A2($elm$html$Html$span, _List_fromArray([
-                    $elm$html$Html$Attributes$class('w-4 h-4 border border-2 border-stone-800 flex mr-2')
+                    $elm$html$Html$Attributes$class('mr-2 text-gray-300 border-r pr-1')
+                ]), _List_fromArray([
+                    $elm$html$Html$text($elm$core$String$fromInt(todo.id))
+                ])),
+                A2($elm$html$Html$span, _List_fromArray([
+                    $elm$html$Html$Attributes$classList(_List_fromArray([
+                        _Utils_Tuple2('w-4 h-4 border border-2 border-stone-800 flex mr-2', true),
+                        _Utils_Tuple2('bg-red-400', todo.starting)
+                    ]))
                 ]), _List_Nil),
                 A2($elm$html$Html$label, _List_Nil, _List_fromArray([
                     $elm$html$Html$text(todo.title)
@@ -4024,17 +4114,19 @@ type alias Process =
     };
     var $elm$html$Html$ul = _VirtualDom_node('ul');
     var $author$project$View$rendergroupTodo = function(group) {
-        return A2($elm$html$Html$li, _List_Nil, _List_fromArray([
+        return A2($elm$html$Html$li, _List_fromArray([
+            $elm$html$Html$Attributes$class('flex flex-col items-start mb-10')
+        ]), _List_fromArray([
             A2($elm$html$Html$div, _List_fromArray([
-                $elm$html$Html$Attributes$class('flex items-center')
+                $elm$html$Html$Attributes$class('flex items-center bg-gray-400 items-center px-2 py-1 rounded-md mb-4')
             ]), _List_fromArray([
                 A2($elm$html$Html$div, _List_fromArray([
-                    $elm$html$Html$Attributes$class('mr-4')
+                    $elm$html$Html$Attributes$class('mr-4 font-bold text-md')
                 ]), _List_fromArray([
                     $elm$html$Html$text(group.name)
                 ])),
                 A2($elm$html$Html$div, _List_Nil, _List_fromArray([
-                    $elm$html$Html$text($elm$core$String$fromInt($elm$core$List$length(group.todos)))
+                    $elm$html$Html$text('[' + ($elm$core$String$fromInt($elm$core$List$length(group.todos)) + ']'))
                 ]))
             ])),
             A2($elm$html$Html$ul, _List_Nil, A2($elm$core$List$map, $author$project$View$renderTodo, group.todos))
@@ -4044,18 +4136,31 @@ type alias Process =
         return {
             body: _List_fromArray([
                 A2($elm$html$Html$div, _List_fromArray([
-                    $elm$html$Html$Attributes$class('p-10 h-screen')
+                    $elm$html$Html$Attributes$class('p-10 h-screen relative  ')
                 ]), _List_fromArray([
+                    A2($elm$html$Html$div, _List_fromArray([
+                        $elm$html$Html$Attributes$class('absolute bottom-0 right-0 p-4 bg-gray-300 rounded')
+                    ]), _List_fromArray([
+                        A2($elm$html$Html$div, _List_fromArray([
+                            $elm$html$Html$Attributes$class('flex font-mono items-center text-sm')
+                        ]), _List_fromArray([
+                            $elm$html$Html$text('Type anything to open the input')
+                        ])),
+                        A2($elm$html$Html$div, _List_fromArray([
+                            $elm$html$Html$Attributes$class('flex font-mono items-center text-sm')
+                        ]), _List_fromArray([
+                            $elm$html$Html$text('Type `task @group <title>` to create new task in group')
+                        ])),
+                        A2($elm$html$Html$div, _List_fromArray([
+                            $elm$html$Html$Attributes$class('flex font-mono items-center text-sm')
+                        ]), _List_fromArray([
+                            $elm$html$Html$text('Type `begin <id>` to start a task')
+                        ]))
+                    ])),
                     A2($elm$html$Html$div, _List_fromArray([
                         $elm$html$Html$Attributes$class('flex font-mono items-center text-2xl')
                     ]), _List_fromArray([
-                        $author$project$View$renderInputModal(model),
-                        A2($elm$html$Html$h1, _List_fromArray([
-                            $elm$html$Html$Attributes$class('font-bold mr-4')
-                        ]), _List_fromArray([
-                            $elm$html$Html$text('Pomoday elm: ')
-                        ])),
-                        A2($elm$html$Html$br, _List_Nil, _List_Nil)
+                        $author$project$View$renderInputModal(model)
                     ])),
                     A2($elm$html$Html$div, _List_Nil, _List_fromArray([
                         A2($elm$html$Html$ul, _List_Nil, A2($elm$core$List$map, $author$project$View$rendergroupTodo, model.groups))

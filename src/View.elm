@@ -8,18 +8,27 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Model exposing (Group)
-
+import Html.Attributes exposing (classList)
 
 view : Model -> Browser.Document Msg
 view model =
   { title = "Pomoday Elm"
   , body =
   [
-    div [ class "p-10 h-screen"] [
+    div [ class "p-10 h-screen relative  "] [
+      div [ class "absolute bottom-0 right-0 p-4 bg-gray-300 rounded"] [
+        div [class "flex font-mono items-center text-sm"] [
+          text "Type anything to open the input"
+        ],
+        div [class "flex font-mono items-center text-sm"] [
+          text "Type `task @group <title>` to create new task in group"
+        ],
+        div [class "flex font-mono items-center text-sm"] [
+          text "Type `begin <id>` to start a task"
+        ]
+      ],
       div [class "flex font-mono items-center text-2xl"] [
-        renderInputModal(model),
-        h1 [ class "font-bold mr-4" ] [text "Pomoday elm: "] ,
-        br [] []
+        renderInputModal(model)
       ],
       div [] [
         ul [] (List.map rendergroupTodo model.groups)
@@ -36,21 +45,27 @@ viewLink path =
 
 rendergroupTodo: Group -> Html Msg
 rendergroupTodo group =
-  li [] [
-    div [ class "flex items-center" ] [
-      div [ class "mr-4" ] [ text (group.name) ],
-      div [ ] [ text (String.fromInt (List.length group.todos) ) ]
+  li [class "flex flex-col items-start mb-10"] [
+    div [ class "flex items-center bg-gray-400 items-center px-2 py-1 rounded-md mb-4" ] [
+      div [ class "mr-4 font-bold text-md" ] [ text (group.name) ],
+      div [ ] [ text ("[" ++ (String.fromInt (List.length group.todos) ++ "]")) ]
     ],
     ul [] (List.map renderTodo group.todos)
   ]
 
 renderTodo : Todo -> Html Msg
 renderTodo todo =
-  li [ class "todo" ]
+  li [ class "todo p-2" ]
     [ 
       div [ class "flex items-center view" ]
       [
-        span [ class "w-4 h-4 border border-2 border-stone-800 flex mr-2"][],
+        span [ class "mr-2 text-gray-300 border-r pr-1"] [text (String.fromInt todo.id)],
+        span [ 
+          classList [
+            ("w-4 h-4 border border-2 border-stone-800 flex mr-2", True),
+            ("bg-red-400", todo.starting)
+          ]
+          ][],
         label [] [ text todo.title ]
       ]
     ]

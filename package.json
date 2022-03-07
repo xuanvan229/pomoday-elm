@@ -12,7 +12,7 @@
     "compile": "run-p compile:elm compile:css",
     "dev": "run-p watch serve",
     "build": "elm make src/Main.elm --output=public/assets/js/elm.js --optimize",
-    "serve": "serve dist",
+    "serve": "serve public",
     "watch:elm": "watch 'yarn run compile:elm' src",
     "watch:css": "watch 'yarn run compile:css' stylesheet src",
     "watch": "run-p watch:elm watch:css",

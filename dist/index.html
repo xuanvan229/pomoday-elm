@@ -1,1 +1,75 @@
-<!DOCTYPE HTML><html><head><meta charset="utf-8"><title>Main</title><style>body{margin:0;padding:0}</style><link rel="stylesheet" href="/index.ec662bc5.css"></head><body> <pre id="elm"></pre> <script src="/index.7ba462fa.js"></script> <script>var app=Elm.Main.init({node:document.getElementById("elm")});app.ports.parseString.subscribe((function(t){const s=t=>t.match(/^(t(?:ask)?)\s(@(?:\S*['-]?)(?:[0-9a-zA-Z'-]+))?([\s\S]*)/i),e={group:s(t)[2],title:s(t)[3]};app.ports.getTaskParsed.send(JSON.stringify(e))}));</script> </body></html>
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Main</title>
+  <style>body {
+  padding: 0; margin: 0;
+}
+</style>
+	<link rel="stylesheet" href="/index.00fcb217.css">
+
+</head>
+
+<body>
+
+<pre id="elm"></pre>
+
+<script src="/index.5e8e39a4.js"></script>
+
+<script>var app = Elm.Main.init({
+    node: document.getElementById('elm')
+});
+const parseBeginCommand = (str)=>str.match(/^(b(?:egin)?)\s([\s\S]*)/i)
+;
+const parseTaskCommand = (str)=>str.match(/^(t(?:ask)?)\s(@(?:\S*['-]?)(?:[0-9a-zA-Z'-]+))?([\s\S]*)/i)
+;
+function compileTaskCommand(input) {
+    const matchTask = parseTaskCommand(input);
+    if (matchTask) return {
+        command: matchTask[1],
+        group: matchTask[2],
+        text: matchTask[3].trim()
+    };
+    return null;
+}
+function compileBeginCommand(input) {
+    const matchOther = parseBeginCommand(input);
+    if (matchOther) return {
+        command: matchOther[1],
+        id: matchOther[2]
+    };
+    return null;
+}
+function parseCommand(input) {
+    let ret;
+    ret = compileTaskCommand(input);
+    if (ret) return ret;
+    ret = compileBeginCommand(input);
+    if (ret) return ret;
+    return null;
+}
+app.ports.parseString.subscribe(function(message) {
+    const cmd = parseCommand(message);
+    let todo;
+    switch(cmd.command.toLowerCase()){
+        case 't':
+        case 'task':
+            todo = {
+                group: cmd.group,
+                title: cmd.text
+            };
+            app.ports.createNewTask.send(JSON.stringify(todo));
+            break;
+        case 'b':
+        case 'begin':
+            app.ports.startATask.send(Number(cmd.id));
+            break;
+        default:
+            break;
+    }
+});
+
+</script>
+</body>
+</html>

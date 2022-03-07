@@ -20,13 +20,68 @@
     node: document.getElementById('elm')
   });
 
-  app.ports.parseString.subscribe(function(message) {
-    const parseTaskCommand = (str) => str.match(/^(t(?:ask)?)\s(@(?:\S*['-]?)(?:[0-9a-zA-Z'-]+))?([\s\S]*)/i);
-    const todo = {
-      group : parseTaskCommand(message)[2],
-      title: parseTaskCommand(message)[3]
+  const parseBeginCommand = (str) => str.match(/^(b(?:egin)?)\s([\s\S]*)/i);
+  const parseTaskCommand = (str) => str.match(/^(t(?:ask)?)\s(@(?:\S*['-]?)(?:[0-9a-zA-Z'-]+))?([\s\S]*)/i);
+
+
+  function compileTaskCommand(input) {
+    const matchTask = parseTaskCommand(input);
+    if (matchTask) {
+      return {
+        command: matchTask[1],
+        group: matchTask[2],
+        text: matchTask[3].trim(),
+      };
     }
-    app.ports.getTaskParsed.send(JSON.stringify(todo))
+    return null;
+  }
+
+  function compileBeginCommand(input) {
+    const matchOther = parseBeginCommand(input) 
+    if (matchOther) {
+      return {
+        command: matchOther[1],
+        id: matchOther[2],
+      };
+    }
+    return null;
+  }
+
+  function parseCommand(input) {
+    let ret;
+    ret = compileTaskCommand(input);
+    if (ret) return ret;
+
+    ret = compileBeginCommand(input);
+    if (ret) return ret;
+
+    return null;
+  }
+
+  app.ports.parseString.subscribe(function(message) {
+
+    const cmd = parseCommand(message);
+    let todo
+    switch (cmd.command.toLowerCase()) {
+      case 't':
+      case 'task':
+        todo = {
+          group : cmd.group,
+          title: cmd.text
+        }
+        app.ports.createNewTask.send(JSON.stringify(todo))
+        break;
+      case 'b':
+      case 'begin':
+        app.ports.startATask.send(Number(cmd.id))
+        break;
+      default:
+        break;
+
+    }
+    
+    
+   
   });
   
   </script>
