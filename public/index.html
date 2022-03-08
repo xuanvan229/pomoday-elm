@@ -22,7 +22,7 @@
 
   const parseBeginCommand = (str) => str.match(/^(b(?:egin)?)\s([\s\S]*)/i);
   const parseTaskCommand = (str) => str.match(/^(t(?:ask)?)\s(@(?:\S*['-]?)(?:[0-9a-zA-Z'-]+))?([\s\S]*)/i);
-
+  const parseCheckCommand = (str) => str.match(/^(c(?:heck)?)\s([\s\S]*)/i);
 
   function compileTaskCommand(input) {
     const matchTask = parseTaskCommand(input);
@@ -47,12 +47,26 @@
     return null;
   }
 
+  function compileCheckCommand(input) {
+    const matchOther = parseCheckCommand(input) 
+    if (matchOther) {
+      return {
+        command: matchOther[1],
+        id: matchOther[2],
+      };
+    }
+    return null;
+  }
+
   function parseCommand(input) {
     let ret;
     ret = compileTaskCommand(input);
     if (ret) return ret;
 
     ret = compileBeginCommand(input);
+    if (ret) return ret;
+
+    ret = compileCheckCommand(input);
     if (ret) return ret;
 
     return null;
@@ -62,26 +76,28 @@
 
     const cmd = parseCommand(message);
     let todo
-    switch (cmd.command.toLowerCase()) {
-      case 't':
-      case 'task':
-        todo = {
-          group : cmd.group,
-          title: cmd.text
-        }
-        app.ports.createNewTask.send(JSON.stringify(todo))
-        break;
-      case 'b':
-      case 'begin':
-        app.ports.startATask.send(Number(cmd.id))
-        break;
-      default:
-        break;
-
+    if(cmd) {
+      switch (cmd.command.toLowerCase()) {
+        case 't':
+        case 'task':
+          todo = {
+            group : cmd.group,
+            title: cmd.text
+          }
+          app.ports.createNewTask.send(JSON.stringify(todo))
+          break;
+        case 'b':
+        case 'begin':
+          app.ports.startATask.send(Number(cmd.id))
+          break;
+        case 'c':
+        case 'check':
+          app.ports.finishATask.send(Number(cmd.id))
+          break;
+        default:
+          break;
+      }
     }
-    
-    
-   
   });
   
   </script>

@@ -47,11 +47,17 @@ update msg model =
         ( { model | show = True }, Cmd.none )
     BeginTask id -> 
       let
-        updateTodos item = if (item.id == id ) then {item | starting = True} else  item
+        updateTodos item = if (item.id == id ) then {item | starting = True, completed = False} else  item
         updateGroup group = {group | todos = List.map updateTodos group.todos}
         groups = List.map updateGroup model.groups
       in
-      
+      ( {model | groups = groups}, Cmd.none )
+    FinishTask id -> 
+       let
+        updateTodos item = if (item.id == id ) then {item | starting = False, completed = True} else  item
+        updateGroup group = {group | todos = List.map updateTodos group.todos}
+        groups = List.map updateGroup model.groups
+      in
       ( {model | groups = groups}, Cmd.none )
     CreateTask jsonData -> 
       case decodeString todoCreate jsonData of

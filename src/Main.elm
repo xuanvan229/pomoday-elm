@@ -9,7 +9,6 @@ import Html.Attributes exposing (..)
 import Json.Decode as Decode
 import Html.Events exposing (onInput)
 import Url
-import Task
 import Model exposing (Todo, Group, Model)
 import View exposing (view)
 import Msg exposing (Msg(..))
@@ -51,10 +50,11 @@ init flags url key =
 
 port createNewTask : (String -> msg) -> Sub msg
 port startATask : (Int -> msg) -> Sub msg
+port finishATask: (Int -> msg) -> Sub msg
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-  Sub.batch [ Events.onKeyDown keyDecoder, createNewTask CreateTask, startATask BeginTask]
+  Sub.batch [ Events.onKeyDown keyDecoder, createNewTask CreateTask, startATask BeginTask, finishATask FinishTask ]
 
 
 

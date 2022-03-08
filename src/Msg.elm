@@ -12,4 +12,5 @@ type Msg
   | OnChange String
   | CreateTask String
   | BeginTask Int
+  | FinishTask Int
   | NoOp

@@ -25,6 +25,9 @@ view model =
         ],
         div [class "flex font-mono items-center text-sm"] [
           text "Type `begin <id>` to start a task"
+        ],
+          div [class "flex font-mono items-center text-sm"] [
+          text "Type `check <id>` to finish a task"
         ]
       ],
       div [class "flex font-mono items-center text-2xl"] [
@@ -63,7 +66,8 @@ renderTodo todo =
         span [ 
           classList [
             ("w-4 h-4 border border-2 border-stone-800 flex mr-2", True),
-            ("bg-red-400", todo.starting)
+            ("bg-red-200", todo.starting),
+            ("bg-green-400", todo.completed)
           ]
           ][],
         label [] [ text todo.title ]

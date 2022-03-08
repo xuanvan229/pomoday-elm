@@ -5202,9 +5202,14 @@ var $author$project$Msg$BeginTask = function (a) {
 var $author$project$Msg$CreateTask = function (a) {
 	return {$: 'CreateTask', a: a};
 };
+var $author$project$Msg$FinishTask = function (a) {
+	return {$: 'FinishTask', a: a};
+};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$createNewTask = _Platform_incomingPort('createNewTask', $elm$json$Json$Decode$string);
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $author$project$Main$finishATask = _Platform_incomingPort('finishATask', $elm$json$Json$Decode$int);
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $author$project$Msg$PressedLetter = function (a) {
 	return {$: 'PressedLetter', a: a};
@@ -5627,7 +5632,6 @@ var $elm$browser$Browser$Events$on = F3(
 			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
 	});
 var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keydown');
-var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $author$project$Main$startATask = _Platform_incomingPort('startATask', $elm$json$Json$Decode$int);
 var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
@@ -5635,7 +5639,8 @@ var $author$project$Main$subscriptions = function (_v0) {
 			[
 				$elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDecoder),
 				$author$project$Main$createNewTask($author$project$Msg$CreateTask),
-				$author$project$Main$startATask($author$project$Msg$BeginTask)
+				$author$project$Main$startATask($author$project$Msg$BeginTask),
+				$author$project$Main$finishATask($author$project$Msg$FinishTask)
 			]));
 };
 var $elm$core$List$any = F2(
@@ -5825,7 +5830,27 @@ var $author$project$Update$update = F2(
 				var updateTodos = function (item) {
 					return _Utils_eq(item.id, id) ? _Utils_update(
 						item,
-						{starting: true}) : item;
+						{completed: false, starting: true}) : item;
+				};
+				var updateGroup = function (group) {
+					return _Utils_update(
+						group,
+						{
+							todos: A2($elm$core$List$map, updateTodos, group.todos)
+						});
+				};
+				var groups = A2($elm$core$List$map, updateGroup, model.groups);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{groups: groups}),
+					$elm$core$Platform$Cmd$none);
+			case 'FinishTask':
+				var id = msg.a;
+				var updateTodos = function (item) {
+					return _Utils_eq(item.id, id) ? _Utils_update(
+						item,
+						{completed: true, starting: false}) : item;
 				};
 				var updateGroup = function (group) {
 					return _Utils_update(
@@ -6037,7 +6062,8 @@ var $author$project$View$renderTodo = function (todo) {
 								_List_fromArray(
 									[
 										_Utils_Tuple2('w-4 h-4 border border-2 border-stone-800 flex mr-2', true),
-										_Utils_Tuple2('bg-red-400', todo.starting)
+										_Utils_Tuple2('bg-red-200', todo.starting),
+										_Utils_Tuple2('bg-green-400', todo.completed)
 									]))
 							]),
 						_List_Nil),
@@ -6144,6 +6170,16 @@ var $author$project$View$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Type `begin <id>` to start a task')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('flex font-mono items-center text-sm')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Type `check <id>` to finish a task')
 									]))
 							])),
 						A2(
