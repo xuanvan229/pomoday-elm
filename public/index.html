@@ -38,7 +38,8 @@
 
   function compileBeginCommand(input) {
     const matchOther = parseBeginCommand(input) 
-    if (matchOther) {
+    console.log('mathOther', matchOther);
+    if (matchOther && !isNaN(matchOther[2])) {
       return {
         command: matchOther[1],
         id: matchOther[2],
@@ -49,7 +50,7 @@
 
   function compileCheckCommand(input) {
     const matchOther = parseCheckCommand(input) 
-    if (matchOther) {
+    if (matchOther && !isNaN(matchOther[2])) {
       return {
         command: matchOther[1],
         id: matchOther[2],
