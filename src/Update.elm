@@ -45,16 +45,19 @@ update msg model =
         ( { model | show = False, text = "" }, parseString model.text )
       else
         ( { model | show = True }, Cmd.none )
-    BeginTask id -> 
+    BeginTask list_id -> 
       let
-        updateTodos item = if (item.id == id ) then {item | starting = True, completed = False} else  item
+        findItemMatch item = List.filter (\id -> id == item.id) list_id
+
+        updateTodos item = if (List.length (findItemMatch item) == 1) then {item | starting = True, completed = False} else  item
         updateGroup group = {group | todos = List.map updateTodos group.todos}
         groups = List.map updateGroup model.groups
       in
       ( {model | groups = groups}, Cmd.none )
-    FinishTask id -> 
+    FinishTask list_id -> 
        let
-        updateTodos item = if (item.id == id ) then {item | starting = False, completed = True} else  item
+        findItemMatch item = List.filter (\id -> id == item.id) list_id
+        updateTodos item = if (List.length (findItemMatch item) == 1) then {item | starting = False, completed = True} else  item
         updateGroup group = {group | todos = List.map updateTodos group.todos}
         groups = List.map updateGroup model.groups
       in

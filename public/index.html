@@ -38,11 +38,11 @@
 
   function compileBeginCommand(input) {
     const matchOther = parseBeginCommand(input) 
-    console.log('mathOther', matchOther);
-    if (matchOther && !isNaN(matchOther[2])) {
+    if (matchOther ) {
+      const listID = matchOther[2].split(' ').map(id => parseInt(id)).filter(id => !isNaN(id));
       return {
         command: matchOther[1],
-        id: matchOther[2],
+        id: listID,
       };
     }
     return null;
@@ -50,10 +50,11 @@
 
   function compileCheckCommand(input) {
     const matchOther = parseCheckCommand(input) 
-    if (matchOther && !isNaN(matchOther[2])) {
+    if (matchOther) {
+      const listID = matchOther[2].split(' ').map(id => parseInt(id)).filter(id => !isNaN(id));
       return {
         command: matchOther[1],
-        id: matchOther[2],
+        id: listID,
       };
     }
     return null;
@@ -89,11 +90,11 @@
           break;
         case 'b':
         case 'begin':
-          app.ports.startATask.send(Number(cmd.id))
+          app.ports.startATask.send(cmd.id)
           break;
         case 'c':
         case 'check':
-          app.ports.finishATask.send(Number(cmd.id))
+          app.ports.finishATask.send(cmd.id)
           break;
         default:
           break;

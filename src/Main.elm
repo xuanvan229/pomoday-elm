@@ -49,8 +49,8 @@ init flags url key =
 
 
 port createNewTask : (String -> msg) -> Sub msg
-port startATask : (Int -> msg) -> Sub msg
-port finishATask: (Int -> msg) -> Sub msg
+port startATask : (List Int -> msg) -> Sub msg
+port finishATask: (List Int -> msg) -> Sub msg
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =

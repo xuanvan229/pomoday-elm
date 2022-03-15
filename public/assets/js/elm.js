@@ -5209,7 +5209,10 @@ var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$createNewTask = _Platform_incomingPort('createNewTask', $elm$json$Json$Decode$string);
 var $elm$json$Json$Decode$int = _Json_decodeInt;
-var $author$project$Main$finishATask = _Platform_incomingPort('finishATask', $elm$json$Json$Decode$int);
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $author$project$Main$finishATask = _Platform_incomingPort(
+	'finishATask',
+	$elm$json$Json$Decode$list($elm$json$Json$Decode$int));
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $author$project$Msg$PressedLetter = function (a) {
 	return {$: 'PressedLetter', a: a};
@@ -5632,7 +5635,9 @@ var $elm$browser$Browser$Events$on = F3(
 			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
 	});
 var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keydown');
-var $author$project$Main$startATask = _Platform_incomingPort('startATask', $elm$json$Json$Decode$int);
+var $author$project$Main$startATask = _Platform_incomingPort(
+	'startATask',
+	$elm$json$Json$Decode$list($elm$json$Json$Decode$int));
 var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
@@ -5665,6 +5670,17 @@ var $elm$core$List$any = F2(
 		}
 	});
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $author$project$Msg$NoOp = {$: 'NoOp'};
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
@@ -5826,9 +5842,18 @@ var $author$project$Update$update = F2(
 						{show: true}),
 					$elm$core$Platform$Cmd$none));
 			case 'BeginTask':
-				var id = msg.a;
+				var list_id = msg.a;
+				var findItemMatch = function (item) {
+					return A2(
+						$elm$core$List$filter,
+						function (id) {
+							return _Utils_eq(id, item.id);
+						},
+						list_id);
+				};
 				var updateTodos = function (item) {
-					return _Utils_eq(item.id, id) ? _Utils_update(
+					return ($elm$core$List$length(
+						findItemMatch(item)) === 1) ? _Utils_update(
 						item,
 						{completed: false, starting: true}) : item;
 				};
@@ -5846,9 +5871,18 @@ var $author$project$Update$update = F2(
 						{groups: groups}),
 					$elm$core$Platform$Cmd$none);
 			case 'FinishTask':
-				var id = msg.a;
+				var list_id = msg.a;
+				var findItemMatch = function (item) {
+					return A2(
+						$elm$core$List$filter,
+						function (id) {
+							return _Utils_eq(id, item.id);
+						},
+						list_id);
+				};
 				var updateTodos = function (item) {
-					return _Utils_eq(item.id, id) ? _Utils_update(
+					return ($elm$core$List$length(
+						findItemMatch(item)) === 1) ? _Utils_update(
 						item,
 						{completed: true, starting: false}) : item;
 				};
@@ -5997,17 +6031,6 @@ var $author$project$View$renderInputModal = function (model) {
 			])) : A2($elm$html$Html$div, _List_Nil, _List_Nil);
 };
 var $elm$html$Html$li = _VirtualDom_node('li');
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;

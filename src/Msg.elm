@@ -11,6 +11,6 @@ type Msg
   | TodoAdded String
   | OnChange String
   | CreateTask String
-  | BeginTask Int
-  | FinishTask Int
+  | BeginTask (List Int)
+  | FinishTask (List Int)
   | NoOp
