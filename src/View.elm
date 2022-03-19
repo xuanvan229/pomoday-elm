@@ -9,6 +9,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Model exposing (Group)
 import Html.Attributes exposing (classList)
+import Svg exposing (svg, polyline)
+import Svg.Attributes exposing (width, height, viewBox, fill, stroke, strokeWidth, points)
 
 view : Model -> Browser.Document Msg
 view model =
@@ -56,6 +58,28 @@ rendergroupTodo group =
     ul [] (List.map renderTodo group.todos)
   ]
 
+renderStatus: Todo -> Html Msg
+renderStatus todo =
+  if todo.completed then
+      span [ 
+          classList [
+            ("flex mr-2 fill-blue-500", True)
+          ]
+          ][
+            svg [ Svg.Attributes.width "24px",  Svg.Attributes.height "24px", viewBox "0 0 24 24" ] [ polyline [ fill "none", stroke "rgb(34 197 94)", strokeWidth "2", points "6 13 10.2 16.6 18 7" ] [] ]]
+    else if todo.starting then
+         span [ 
+          classList [
+            ("flex justify-center w-6 h-6 mr-2 text-red-400 text-xl font-bold", True)
+          ]
+          ][text "*"]
+    else
+      span [ 
+          classList [
+            ("w-6 h-6 border border-2 border-stone-800 flex mr-2", True)
+          ]
+          ][]
+
 renderTodo : Todo -> Html Msg
 renderTodo todo =
   li [ class "todo p-2" ]
@@ -63,13 +87,7 @@ renderTodo todo =
       div [ class "flex items-center view" ]
       [
         span [ class "mr-2 text-gray-300 border-r pr-1"] [text (String.fromInt todo.id)],
-        span [ 
-          classList [
-            ("w-4 h-4 border border-2 border-stone-800 flex mr-2", True),
-            ("bg-red-200", todo.starting),
-            ("bg-green-400", todo.completed)
-          ]
-          ][],
+        renderStatus todo,
         label [] [ text todo.title ]
       ]
     ]

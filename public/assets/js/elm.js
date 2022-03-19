@@ -6031,6 +6031,7 @@ var $author$project$View$renderInputModal = function (model) {
 			])) : A2($elm$html$Html$div, _List_Nil, _List_Nil);
 };
 var $elm$html$Html$li = _VirtualDom_node('li');
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
@@ -6045,10 +6046,78 @@ var $elm$html$Html$Attributes$classList = function (classes) {
 				$elm$core$Tuple$first,
 				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
 };
-var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$polyline = $elm$svg$Svg$trustedNode('polyline');
 var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $author$project$View$renderStatus = function (todo) {
+	return todo.completed ? A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('flex mr-2 fill-blue-500', true)
+					]))
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$svg,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$width('24px'),
+						$elm$svg$Svg$Attributes$height('24px'),
+						$elm$svg$Svg$Attributes$viewBox('0 0 24 24')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$polyline,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$fill('none'),
+								$elm$svg$Svg$Attributes$stroke('rgb(34 197 94)'),
+								$elm$svg$Svg$Attributes$strokeWidth('2'),
+								$elm$svg$Svg$Attributes$points('6 13 10.2 16.6 18 7')
+							]),
+						_List_Nil)
+					]))
+			])) : (todo.starting ? A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('flex justify-center w-6 h-6 mr-2 text-red-400 text-xl font-bold', true)
+					]))
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text('*')
+			])) : A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('w-6 h-6 border border-2 border-stone-800 flex mr-2', true)
+					]))
+			]),
+		_List_Nil));
+};
 var $author$project$View$renderTodo = function (todo) {
 	return A2(
 		$elm$html$Html$li,
@@ -6077,19 +6146,7 @@ var $author$project$View$renderTodo = function (todo) {
 								$elm$html$Html$text(
 								$elm$core$String$fromInt(todo.id))
 							])),
-						A2(
-						$elm$html$Html$span,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$classList(
-								_List_fromArray(
-									[
-										_Utils_Tuple2('w-4 h-4 border border-2 border-stone-800 flex mr-2', true),
-										_Utils_Tuple2('bg-red-200', todo.starting),
-										_Utils_Tuple2('bg-green-400', todo.completed)
-									]))
-							]),
-						_List_Nil),
+						$author$project$View$renderStatus(todo),
 						A2(
 						$elm$html$Html$label,
 						_List_Nil,
