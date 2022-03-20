@@ -8,8 +8,32 @@ import Browser.Dom as Dom
 import Task
 import Json.Decode exposing (Decoder, decodeString, field, string)
 import Json.Decode exposing (map2)
+import Json.Encode exposing (int, string, bool, object)
+import Json.Encode exposing (list)
 
 port parseString : String -> Cmd msg
+port saveTasks: String -> Cmd msg
+
+encodeTasks : Todo -> Json.Encode.Value
+encodeTasks todo = 
+  object
+        [ ( "id", int todo.id )
+        , ( "title", Json.Encode.string todo.title )
+        , ( "completed", bool todo.completed )
+        , ( "starting", bool todo.starting )
+        ]
+
+encodeGroup: Group -> Json.Encode.Value
+encodeGroup group = 
+   object
+        [ ( "name", Json.Encode.string group.name )
+        ]
+
+saveListTasks: List Group -> Cmd msg
+saveListTasks group = 
+     Json.Encode.list encodeGroup group
+        |> Json.Encode.encode 0
+        |> saveTasks
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -86,5 +110,5 @@ focusSearchBox =
 todoCreate : Decoder Model.TodoCreate
 todoCreate =
   map2 Model.TodoCreate
-    (field "title" string)
-    (field "group" string)
+    (field "title" Json.Decode.string)
+    (field "group" Json.Decode.string)
